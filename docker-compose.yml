@@ -16,8 +16,8 @@ services:
       context: .
       dockerfile: Dockerfile.mydb 
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mydb
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: $[MYSQL_DATABASE]
     networks:
       - dockercompose-frontend
     volumes:
