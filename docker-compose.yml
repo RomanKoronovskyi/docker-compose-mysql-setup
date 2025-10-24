@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "8080:80"
+    networks:
+      - dockercompose-frontend
+    depends_on:
+      - mydb
+
+  mydb:
+    build: 
+      context: .
+      dockerfile: Dockerfile.mydb 
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+    networks:
+      - dockercompose-frontend
+    volumes:
+      - dockercompose-mydb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 15s
+      retries: 5
+
+networks:
+  dockercompose-frontend:
+    name: dockercompose-frontend
+
+volumes:
+  dockercompose-mydb:
+    name: dockercompose-mydb
+    
