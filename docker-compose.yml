@@ -17,13 +17,13 @@ services:
       dockerfile: Dockerfile.mydb 
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: $[MYSQL_DATABASE]
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     networks:
       - dockercompose-frontend
     volumes:
       - dockercompose-mydb:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 15s
       retries: 5
