@@ -1,36 +1,45 @@
-version: "3.8"
 services:
-  frontend:
+  petclinic:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: Dockerfile
     ports:
-      - "8080:80"
-    networks:
-      - dockercompose-frontend
-    depends_on:
-      - mydb
-
-  mydb:
-    build: 
-      context: .
-      dockerfile: Dockerfile.mydb 
+      - "8080:8080"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mydb
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqlserver:3306/petclinic
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    depends_on:
+      - mysqlserver
     networks:
-      - dockercompose-frontend
+      - petclinic
+    restart: unless-stopped
+
+  mysqlserver:
+    container_name: mysqlserver
+    image: hlebsur/mysql:8
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: $${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - dockercompose-mydb:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 10s
-      timeout: 15s
-      retries: 5
+      - mysql_data:/var/lib/mysql
+      - mysql_config:/etc/mysql/conf.d
+    networks:
+      - petclinic
+
+volumes:
+  mysql_data:
+  mysql_config:
 
 networks:
-  dockercompose-frontend:
-    name: dockercompose-frontend
+  petclinic:
+    driver: bridge
 
 volumes:
   dockercompose-mydb:
